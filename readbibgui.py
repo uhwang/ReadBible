@@ -20,6 +20,8 @@ import icon_font_picker02
 import icon_color_picker01
 import icon_color_picker02
 
+import icon_readbib
+
 scheduler_keys = ('WORD', 'EXCEL')
 
 def get_scheduler_key(key):
@@ -233,6 +235,10 @@ class QReadBible(QtGui.QWidget):
         layout.addRow(excel_group)
         layout.addRow(run_layout)
         self.setLayout(layout)
+        
+        self.setWindowTitle("ReadBib")
+        self.setWindowIcon(QtGui.QIcon(QtGui.QPixmap(icon_readbib.table)))
+        
         self.show()
         
     def choose_color(self, col):
