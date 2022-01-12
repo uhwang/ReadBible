@@ -1,6 +1,6 @@
 '''
 
-
+    22/01/12
 
 Sub fit()
 Worksheets("Sheet1").Columns("A:AN").AutoFit
@@ -37,6 +37,8 @@ from docx.shared import Inches
 import schedule
 from docx.shared import Inches, Cm
 import xlsxwriter as xlw
+from datetime import date, timedelta
+import bwxrefcom
     
 _week_days = ['월','화','수','목','금','토', '일']
 _sunday = 6
@@ -74,28 +76,30 @@ def auto_fit_excel_column(file):
     excel.Application.Quit()
 
 def create_bible_reading_schedule_excel(
-        xlsx_file, 
+        file_out, 
+        year,
         start_mon, 
         end_mon, 
         ncol,
-        year,
+        auto_fit, 
+        delay_time,
         include_sunday=False):
         
+    #print(xlsx_file, year, start_mon, end_mon, ncol, auto_fit)
     ncolumn_sub = 4
     try:
-        workbook = xlw.Workbook(xlsx_file)
+        workbook = xlw.Workbook(file_out)
         
     except Exception as e:
         e_str = "... Error(xref_to_docx): Can't create Word Document.\n%s"%str(e)
-        #msg.appendPlainText(e_str)
-        #bwxrefcom.message_box(bwxrefcom.message_error, e_str)
-        print(e_str)
+        bwxrefcom.message_box(bwxrefcom.message_error, e_str)
         return False
+        
     worksheet = workbook.add_worksheet()
     checkbox_format = workbook.add_format({'bold': True, 'font_size': 9, 'font_color': 'red'})
     cell_format = workbook.add_format({'font_size': 8})
         
-    month_days = list(map(lambda mon: calendar.monthrange(year,mon), range(start_mon,end_mon)))
+    month_days = list(map(lambda mon: calendar.monthrange(year,mon), range(start_mon,end_mon+1)))
     
     nrow, mod = divmod(_max_read_day, ncol)
     
@@ -152,17 +156,24 @@ def create_bible_reading_schedule_excel(
                 #table = document.add_table(rows, cols)
     
     workbook.close()
-    time.sleep(1)
-    auto_fit_excel_column(os.path.join(os.getcwd(), xlsx_file))
     
-def create_bible_reading_schedule(
+    if auto_fit:
+        time.sleep(delay_time)
+        auto_fit_excel_column(os.path.join(os.getcwd(), file_out))
+    #print('success')
+    bwxrefcom.message_box(bwxrefcom.message_normal, "Success")
+    
+def create_bible_reading_schedule_word(
         file_out, 
+        year,
         start_mon, 
         end_mon, 
-        nrow, ncol,
-        year,
+        nrow, 
+        ncol,
         include_sunday=False):
 
+    #print(file_out, year, start_mon, end_mon, nrow, ncol)
+    
     try:
         document = Document('default.docx')
     except Exception as e:
@@ -183,7 +194,7 @@ def create_bible_reading_schedule(
     # Tuple (start day, total days)
     # start day: mon(0) - sun(6)
     # total days
-    month_days = list(map(lambda mon: calendar.monthrange(year,mon), range(start_mon,end_mon)))
+    month_days = list(map(lambda mon: calendar.monthrange(year,mon), range(start_mon,end_mon+1)))
     #
     # 150 + 150
     # 150/3 = 50
@@ -253,9 +264,16 @@ def create_bible_reading_schedule(
             #    #continue
           
     document.save(file_out)
+    #print("success")
+    bwxrefcom.message_box(bwxrefcom.message_normal, "Success")
     
+def find_last_date(mon, day, year, days, include_start_date=True):
+    date1 = date(year, mon, day)
+    date2 = date1 + timedelta(days=days-1 if include_start_date else days)
+    return date2
     
-#create_bible_reading_schedule('test.docx', 2, 13, 25, 3, 2022, True)
-xlsx_file = 'test.xlsx'
-create_bible_reading_schedule_excel(xlsx_file, 2, 13, 8, 2022, True)
+#create_bible_reading_schedule_word('test.docx', 2022, 2, 2, 25, 2, True)
+#xlsx_file = 'test.xlsx'
+#create_bible_reading_schedule_excel(xlsx_file, 2, 13, 8, 2022, True)
 #auto_fit_excel_column(os.path.join(os.getcwd(), xlsx_file))
+#print(find_last_date(2,1,2022, 300))
