@@ -221,6 +221,12 @@ class QReadBible(QtGui.QWidget):
         run_layout.addWidget(self.run_excel_btn)
         run_layout.addWidget(self.run_setting_btn)
         
+        only_int = QtGui.QIntValidator()
+        self.excel_columns.setValidator(only_int)
+        self.excel_delay.setValidator(only_int)
+        self.word_rows.setValidator(only_int)
+        self.word_columns.setValidator(only_int)
+        
         layout.addRow(file_group)
         layout.addRow(date_group)
         layout.addRow(word_group)
