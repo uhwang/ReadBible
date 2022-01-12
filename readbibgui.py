@@ -1,6 +1,6 @@
 '''
     22/01/11
-    
+    22/01/12
 '''
 import re, os, sys, datetime
 from PyQt4 import QtCore, QtGui
@@ -12,14 +12,13 @@ import icon_docx
 import icon_excel
 import icon_setting
 import icon_folder_open
-import icon_color_picker
-import icon_font_picker
+#import icon_color_picker
+#import icon_font_picker
 
 import icon_font_picker01
 import icon_font_picker02
 import icon_color_picker01
 import icon_color_picker02
-
 
 scheduler_keys = ('WORD', 'EXCEL')
 
@@ -76,10 +75,11 @@ class QReadBible(QtGui.QWidget):
         file_layout.addWidget(QtGui.QLabel('Dest'), 2, 0)
         self.save_directory_path  = QtGui.QLineEdit(os.getcwd())
         self.save_directory_path_btn = QtGui.QPushButton('', self)
-        self.save_directory_path_btn.clicked.connect(self.get_save_directory_path)
+        self.save_directory_path_btn.clicked.connect(self.change_save_folder)
         self.save_directory_path_btn.setIcon(QtGui.QIcon(QtGui.QPixmap(icon_folder_open.table)))
         self.save_directory_path_btn.setIconSize(QtCore.QSize(16,16))
         self.save_directory_path_btn.setToolTip('save folder')
+
         file_layout.addWidget(self.save_directory_path, 2, 1)
         file_layout.addWidget(self.save_directory_path_btn, 2, 2)
         file_layout.setContentsMargins(3,3,3,3)
@@ -229,7 +229,6 @@ class QReadBible(QtGui.QWidget):
         self.setLayout(layout)
         self.show()
         
-        
     def choose_color(self, col):
         new_col = QtGui.QColorDialog.getColor(QtGui.QColor(col.r, col.g, col.b))
         if new_col.isValid():
@@ -305,8 +304,12 @@ class QReadBible(QtGui.QWidget):
                 self.excel_info.delay_time,
                 self.excel_info.sunday)
             
-    def get_save_directory_path(self):
-        return
+    def change_save_folder(self):
+        startingDir = os.getcwd() 
+        path = QtGui.QFileDialog.getExistingDirectory(None, 'Save folder', startingDir, 
+        QtGui.QFileDialog.ShowDirsOnly)
+        if not path: return
+        self.save_directory_path.setText(path)
     
 def main(): 
     app = QtGui.QApplication(sys.argv)

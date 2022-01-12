@@ -54,26 +54,36 @@ def add_table_item_title(table, ncol):
         table.rows[0].cells[i*4+2].text = '요일'
         table.rows[0].cells[i*4+3].text = '오늘의 말씀'
     
-
+def access_denied(e_str):
+    key = ["access", "denied", "used", "another", "permission"]
+    return any(x in e_str.lower() for x in key)
+    
 def auto_fit_excel_column(file):
     from win32com.client import Dispatch
     
-    excel = Dispatch('Excel.Application')
-    wb = excel.Workbooks.Open(file)
+    try:
+        excel = Dispatch('Excel.Application')
+        wb = excel.Workbooks.Open(file)
     
-    #Activate first sheet
-    excel.Worksheets(1).Activate()
-    
-    #Autofit column in active sheet
-    excel.ActiveSheet.Columns.AutoFit()
-    
-    #Save changes in a new file
-    #wb.SaveAs("D:\\output_fit.xlsx")
-    
-    #Or simply save changes in a current file
-    wb.Save()
-    wb.Close()
-    excel.Application.Quit()
+        #Activate first sheet
+        excel.Worksheets(1).Activate()
+        
+        #Autofit column in active sheet
+        excel.ActiveSheet.Columns.AutoFit()
+        
+        #Save changes in a new file
+        #wb.SaveAs("D:\\output_fit.xlsx")
+        
+        #Or simply save changes in a current file
+        wb.Save()
+        wb.Close()
+    except Exception as e:
+        e_str = str(e)
+        if access_denied(e_str):
+            e_str += "\n%s is already opened!"%file
+        bwxrefcom.message_box(bwxrefcom.message_error, e_str)
+    finally:
+        excel.Application.Quit()
 
 def create_bible_reading_schedule_excel(
         file_out, 
@@ -89,10 +99,11 @@ def create_bible_reading_schedule_excel(
     ncolumn_sub = 4
     try:
         workbook = xlw.Workbook(file_out)
-        
     except Exception as e:
-        e_str = "... Error(xref_to_docx): Can't create Word Document.\n%s"%str(e)
-        bwxrefcom.message_box(bwxrefcom.message_error, e_str)
+        e_str = "... Error: Can't create Excel Document.\n%s"%str(e)
+        if access_denied(e_str):
+            e_str += "\n%s is already opened!"%file_out
+            bwxrefcom.message_box(bwxrefcom.message_error, e_str)
         return False
         
     worksheet = workbook.add_worksheet()
@@ -114,7 +125,7 @@ def create_bible_reading_schedule_excel(
     
     for i_mon, m_data in enumerate(month_days):
         j_mon = i_mon + start_mon
-        print(calendar.month_name[j_mon])
+        #print(calendar.month_name[j_mon])
         first_day_of_month = m_data[0] # the first day of the month 
         total_day_of_month = m_data[1]
         i_day_of_month = 0
@@ -154,9 +165,15 @@ def create_bible_reading_schedule_excel(
             #    i_day_per_page = 0
                 #document.add_page_break()
                 #table = document.add_table(rows, cols)
-    
-    workbook.close()
-    
+    try:
+        workbook.close()
+    except Exception as e:
+        e_str = "... Error: Can't create Excel Document.\n%s"%str(e)
+        if access_denied(e_str):
+            e_str += "\n%s is already opened!"%file_out
+            bwxrefcom.message_box(bwxrefcom.message_error, e_str)
+        return False
+        
     if auto_fit:
         time.sleep(delay_time)
         auto_fit_excel_column(os.path.join(os.getcwd(), file_out))
@@ -178,9 +195,7 @@ def create_bible_reading_schedule_word(
         document = Document('default.docx')
     except Exception as e:
         e_str = "... Error(xref_to_docx): Can't create Word Document.\n%s"%str(e)
-        #msg.appendPlainText(e_str)
-        #bwxrefcom.message_box(bwxrefcom.message_error, e_str)
-        print(e_str)
+        bwxrefcom.message_box(bwxrefcom.message_error, e_str)
         return False
         
     sections = document.sections
@@ -257,14 +272,20 @@ def create_bible_reading_schedule_word(
                 document.add_page_break()
                 table = document.add_table(rows, cols)
                 
-            
             #if include_sunday and i_weekday > _sunday: 
             #    #i_day_of_month += 1
             #    i_weekday = 0
             #    #continue
           
-    document.save(file_out)
-    #print("success")
+    try:
+        document.save(file_out)
+    except Exception as e:
+        e_str = "... Error: Can't create Excel Document.\n%s"%str(e)
+        if access_denied(e_str):
+            e_str += "\n%s is already opened!"%file_out
+            bwxrefcom.message_box(bwxrefcom.message_error, e_str)
+        return False
+        
     bwxrefcom.message_box(bwxrefcom.message_normal, "Success")
     
 def find_last_date(mon, day, year, days, include_start_date=True):
