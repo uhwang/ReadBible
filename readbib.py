@@ -96,7 +96,7 @@ def create_bible_reading_schedule_excel(
         return False
         
     worksheet = workbook.add_worksheet()
-    checkbox_format = workbook.add_format({'bold': True, 'font_size': 9, 'font_color': 'red'})
+    checkbox_format = workbook.add_format({'bold': True, 'font_size': 9, 'font_color': 'black'})
     cell_format = workbook.add_format({'font_size': 8})
         
     month_days = list(map(lambda mon: calendar.monthrange(year,mon), range(start_mon,end_mon+1)))

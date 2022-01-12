@@ -175,7 +175,7 @@ class QReadBible(QtGui.QWidget):
         self.word_font_btn = QtGui.QPushButton('', self)
         self.word_font_btn.setIcon(QtGui.QIcon(QtGui.QPixmap(icon_font_picker01.table)))
         self.word_font_btn.setIconSize(QtCore.QSize(16,16))
-        self.word_font_btn.clicked.connect(self.choose_excel_font)
+        self.word_font_btn.clicked.connect(self.choose_word_font)
         word_grid.addWidget(self.word_font_btn, 2, 3)
         
         word_grid.addWidget(QtGui.QLabel("Color"), 3, 0)
@@ -223,8 +223,8 @@ class QReadBible(QtGui.QWidget):
         
         layout.addRow(file_group)
         layout.addRow(date_group)
-        layout.addRow(excel_group)
         layout.addRow(word_group)
+        layout.addRow(excel_group)
         layout.addRow(run_layout)
         self.setLayout(layout)
         self.show()
@@ -238,16 +238,16 @@ class QReadBible(QtGui.QWidget):
             return True
         else: return False
         
-    def choose_font(self, fnt):
+    def choose_font(self, font):
         new_font, valid = QtGui.QFontDialog.getFont()
         
         if valid:
-            fnt = new_font.family()
+            font.font_name = new_font.family()
             return True
         else: return False
             
     def choose_excel_font(self):
-        if self.choose_font(self.excel_info.font.font_name):
+        if self.choose_font(self.excel_info.font):
             self.excel_font_name.setText(self.excel_info.font.font_name)
         
     def choose_excel_font_color(self):
@@ -255,7 +255,7 @@ class QReadBible(QtGui.QWidget):
             self.excel_font_color.setText(str(self.excel_info.font.font_color))
 
     def choose_word_font(self):
-        if self.choose_font(self.word_info.font.font_name):
+        if self.choose_font(self.word_info.font):
             self.word_font_name.setText(self.word_info.font.font_name)
         
     def choose_word_font_color(self):
