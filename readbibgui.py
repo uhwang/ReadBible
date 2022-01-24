@@ -151,6 +151,11 @@ class QReadBible(QtGui.QWidget):
         self.excel_sunday = QtGui.QCheckBox()
         self.excel_sunday.setChecked(self.excel_info.sunday)
         excel_grid.addWidget(self.excel_sunday, 5, 1)
+
+        excel_grid.addWidget(QtGui.QLabel("Chk Box"), 5, 2)
+        self.excel_checkbox = QtGui.QCheckBox()
+        self.excel_checkbox.setChecked(self.excel_info.check_box)
+        excel_grid.addWidget(self.excel_checkbox, 5, 3)
         
         excel_grid.setContentsMargins(2,2,2,2)
         excel_grid.setSpacing(2)
@@ -193,6 +198,12 @@ class QReadBible(QtGui.QWidget):
         self.word_sunday = QtGui.QCheckBox()
         self.word_sunday.setChecked(self.word_info.sunday)
         word_grid.addWidget(self.word_sunday, 4, 1)
+        
+        word_grid.addWidget(QtGui.QLabel("Chk Box"), 4, 2)
+        self.word_checkbox = QtGui.QCheckBox()
+        self.word_checkbox.setChecked(self.word_info.sunday)
+        word_grid.addWidget(self.word_checkbox, 4, 3)
+        
         
         word_grid.setContentsMargins(2,2,2,2)
         word_grid.setSpacing(2)
@@ -254,6 +265,7 @@ class QReadBible(QtGui.QWidget):
         
         if valid:
             font.font_name = new_font.family()
+            font.font_size = new_font.pointSize()
             return True
         else: return False
             
@@ -285,15 +297,18 @@ class QReadBible(QtGui.QWidget):
             self.word_info.nrow  = int(self.word_rows.text())
             self.word_info.ncol  = int(self.word_columns.text())
             self.word_info.sunday= self.word_sunday.isChecked()
+            self.word_info.check_box = self.word_checkbox.isChecked()
             
             rb.create_bible_reading_schedule_word(
                 os.path.join(self.word_info.fpath, self.word_info.fname),
                 self.word_info.year  ,
                 self.word_info.month1,
                 self.word_info.month2,
-                self.word_info.nrow,
+                self.word_info.nrow  ,
                 self.word_info.ncol  ,
-                self.word_info.sunday)
+                self.word_info.font  ,
+                self.word_info.sunday,
+                self.word_info.check_box)
         
         elif btn.key == get_excel_scheduler_key():
             self.excel_info.fname = "%s.xlsx"%self.file_name.text()
@@ -305,6 +320,7 @@ class QReadBible(QtGui.QWidget):
             self.excel_info.autofit   = self.excel_autofit.isChecked()
             self.excel_info.delay_time= int(self.excel_delay.text())
             self.excel_info.sunday= self.excel_sunday.isChecked()
+            self.excel_info.check_box = self.excel_checkbox.isChecked()
         
             rb.create_bible_reading_schedule_excel(
                 os.path.join(self.excel_info.fpath, self.excel_info.fname),
@@ -314,7 +330,9 @@ class QReadBible(QtGui.QWidget):
                 self.excel_info.ncol  ,
                 self.excel_info.autofit,
                 self.excel_info.delay_time,
-                self.excel_info.sunday)
+                self.excel_info.font, 
+                self.excel_info.sunday,
+                self.excel_info.check_box)
             
     def change_save_folder(self):
         startingDir = os.getcwd() 

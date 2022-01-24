@@ -28,6 +28,7 @@ class schedule_info:
         self.month1 = 1    # start month
         self.month2 = 12   # end month
         self.sunday = False
+        self.check_box = False
 
 class word_info(schedule_info):
     def __init__(self):

@@ -43,9 +43,10 @@ import bwxrefcom
 _week_days = ['월','화','수','목','금','토', '일']
 _sunday = 6
 _days_per_page = 150
-_ncolumn_sub = 3
+_ncolumn_sub = 4
 _max_read_day = 300
 _bible_reading_verse_data = "300.dat"
+_check_box = "□"
 
 def add_table_item_title(table, ncol):
     for i in range(ncol):
@@ -93,10 +94,12 @@ def create_bible_reading_schedule_excel(
         ncol,
         auto_fit, 
         delay_time,
-        include_sunday=False):
+        font,
+        include_sunday,
+        check_box):
         
     #print(xlsx_file, year, start_mon, end_mon, ncol, auto_fit)
-    ncolumn_sub = 4
+    ncolumn_sub = _ncolumn_sub if check_box else _ncolumn_sub-1
     try:
         workbook = xlw.Workbook(file_out)
     except Exception as e:
@@ -148,7 +151,8 @@ def create_bible_reading_schedule_excel(
             worksheet.write(i_row, i_col*ncolumn_sub+0, info[0], cell_format)
             worksheet.write(i_row, i_col*ncolumn_sub+1, date, cell_format)
             worksheet.write(i_row, i_col*ncolumn_sub+2, info[1], cell_format)
-            worksheet.write(i_row, i_col*ncolumn_sub+3, '□', checkbox_format)
+            if check_box:
+                worksheet.write(i_row, i_col*ncolumn_sub+3, _check_box, checkbox_format)
             
             i_day += 1
             i_row += 1
@@ -187,7 +191,9 @@ def create_bible_reading_schedule_word(
         end_mon, 
         nrow, 
         ncol,
-        include_sunday=False):
+        font, 
+        include_sunday,
+        check_box):
 
     #print(file_out, year, start_mon, end_mon, nrow, ncol)
     
@@ -213,8 +219,9 @@ def create_bible_reading_schedule_word(
     #
     # 150 + 150
     # 150/3 = 50
+    ncolumn_sub = _ncolumn_sub if check_box else _ncolumn_sub-1
     rows = nrow
-    cols = ncol*_ncolumn_sub
+    cols = ncol*ncolumn_sub
     #msg.appendPlainText('... Table(row,col): %d x %d'%(rows,cols))
     table = document.add_table(rows, cols)
     days_per_page = nrow * ncol
@@ -252,10 +259,13 @@ def create_bible_reading_schedule_word(
                 break
                 
             info = schedule.table[i_day]
-            table.rows[i_row].cells[i_col*_ncolumn_sub+0].text = info[0]
-            table.rows[i_row].cells[i_col*_ncolumn_sub+1].text = "%s/%2d/%2d (%s)"%\
+            table.rows[i_row].cells[i_col*ncolumn_sub+0].text = info[0]
+            table.rows[i_row].cells[i_col*ncolumn_sub+1].text = "%s/%2d/%2d (%s)"%\
             (str(year)[-2:],j_mon,i_day_of_month+1, _week_days[i_weekday])
-            table.rows[i_row].cells[i_col*_ncolumn_sub+2].text = info[1]
+            table.rows[i_row].cells[i_col*ncolumn_sub+2].text = info[1]
+            if check_box:
+                table.rows[i_row].cells[i_col*ncolumn_sub+3].text = _check_box
+            
             i_day += 1
             i_row += 1
             i_weekday += 1
